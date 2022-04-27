@@ -6,6 +6,9 @@ import TesseractOcr, {
   LANG_ENGLISH,
   useEventListener,
 } from 'react-native-tesseract-ocr';
+import DocumentPicker from 'react-native-document-picker';
+import PdfThumbnail from 'react-native-pdf-thumbnail';
+import RNFS from 'react-native-fs';
 
 const DEFAULT_HEIGHT = 500;
 const DEFAULT_WITH = 600;
@@ -25,6 +28,7 @@ function App() {
   });
 
   const recognizeTextFromImage = async (path) => {
+    console.log('recognizeTextFromImage image path', path);
     setIsLoading(true);
 
     try {
@@ -34,6 +38,9 @@ function App() {
         LANG_ENGLISH,
         tesseractOptions,
       );
+      console.log(typeof recognizedText);
+      console.log(recognizedText);
+      console.log('Split Text', recognizedText.split(/\r?\n/));
       setText(recognizedText);
     } catch (err) {
       console.error(err);
@@ -68,6 +75,30 @@ function App() {
     }
   };
 
+  const recognizeFromDocument = async () => {
+    try {
+      const document = await DocumentPicker.pickSingle();
+      const images = await PdfThumbnail.generateAllPages(document.uri);
+      // const promises = images.map((image) => recognizeTextFromImage(image.uri));
+      // const results = Promise.all(promises);
+      console.log(images[0]);
+      setImgSrc({uri: images[0].uri});
+      const testFileUri =
+        'file:///storage/emulated/0/Android/data/com.example/files/Pictures/FUCK.jpg';
+
+      RNFS.moveFile(images[0].uri, testFileUri)
+        .then(async (success) => {
+          console.log('FILE MOVED!');
+          await recognizeTextFromImage(testFileUri);
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tesseract OCR example</Text>
@@ -88,6 +119,15 @@ function App() {
             title="Picker"
             onPress={() => {
               recognizeFromPicker();
+            }}
+          />
+        </View>
+        <View style={styles.button}>
+          <Button
+            disabled={isLoading}
+            title="Document"
+            onPress={() => {
+              recognizeFromDocument();
             }}
           />
         </View>

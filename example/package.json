@@ -15,7 +15,10 @@
     "@react-native-community/art": "^1.2.0",
     "react": "16.11.0",
     "react-native": "0.62.2",
+    "react-native-document-picker": "^8.1.0",
+    "react-native-fs": "^2.19.0",
     "react-native-image-crop-picker": "^0.32.2",
+    "react-native-pdf-thumbnail": "^1.0.2",
     "react-native-progress": "^4.0.3",
     "react-native-tesseract-ocr": "link:../"
   },
